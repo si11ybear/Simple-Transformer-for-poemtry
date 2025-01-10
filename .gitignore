@@ -1,0 +1,5 @@
+*.pdf
+*.bib
+*main.ipynb
+/.vscode
+/.history
