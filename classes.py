@@ -10,9 +10,6 @@ from torch.utils.data import DataLoader
 import math
 import torch.nn.functional as F
 from torch.utils.data import TensorDataset
-# 用于绘制损失函数下降曲线
-from matplotlib import pyplot as plt
-# %pdb off
 
 
 class Tokenizer:
@@ -440,11 +437,11 @@ class Transformer(nn.Module):
         如果不手动提供上述掩码，会自动生成默认pad掩码和序列掩码
         """
         if src_padding_mask is None: 
-            src_padding_mask = self.get_key_padding_mask(src).to(DEVICE)
+            src_padding_mask = self.get_key_padding_mask(src)
         if tgt_padding_mask is None: 
-            tgt_padding_mask = self.get_key_padding_mask(tgt).to(DEVICE)
+            tgt_padding_mask = self.get_key_padding_mask(tgt)
         if tgt_sequence_mask is None: 
-            tgt_sequence_mask = self.get_sequence_mask(tgt).to(DEVICE)
+            tgt_sequence_mask = self.get_sequence_mask(tgt)
 
         src = self.embedding(src)
         tgt = self.embedding(tgt)
@@ -463,7 +460,7 @@ class Transformer(nn.Module):
         生成序列掩码
         """
         size = tgt.size()[-1]
-        sr = torch.triu(torch.full((size, size), True, device=DEVICE), diagonal=1)
+        sr = torch.triu(torch.full((size, size), True), diagonal=1)
         # print(sr)
         return sr
 
