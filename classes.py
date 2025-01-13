@@ -1,12 +1,7 @@
-from io import open
-import random
-
 # 深度学习库pytorch
 import torch
 import torch.nn as nn
-import torch.optim as optim
 from torch.autograd import Variable
-from torch.utils.data import DataLoader
 import math
 import torch.nn.functional as F
 from torch.utils.data import TensorDataset
@@ -381,7 +376,7 @@ class TransformerEncoderDecoder(nn.Module):
             ]) for _ in range(num_decoder_layers)
         ])
 
-    def forward(self, encoder_input, decoder_input, src_padding_mask=None, tgt_padding_mask = None, tgt_sequence_mask=None):
+    def forward(self, encoder_input, decoder_input, src_padding_mask=None, tgt_padding_mask = None, tgt_sequence_mask=None, norm_first = False):
         """
         Transformer前向传播
         encoder_input: 编码器输入
@@ -389,19 +384,31 @@ class TransformerEncoderDecoder(nn.Module):
         src_padding_mask: 编码器pad掩码
         tgt_padding_mask: 解码器pad掩码
         tgt_sequence_mask: 解码器自注意力序列掩码，用于遮蔽未来信息
+        norm_first: 是否调整LN结构，如果为True，则先进行归一化和相应计算，再进行残差连接
         """
         for enc in self.encoders:
             attention, norm1, ff, norm2 = enc
-            encoder_input = norm1(attention(encoder_input, padding_mask=src_padding_mask) + encoder_input)
-            encoder_input = norm2(ff(encoder_input) + encoder_input)
+            if not norm_first:
+                encoder_input = norm1(attention(encoder_input, padding_mask=src_padding_mask) + encoder_input)
+                encoder_input = norm2(ff(encoder_input) + encoder_input)
+            else:
+                encoder_input = attention(norm1(encoder_input), padding_mask=src_padding_mask) + encoder_input
+                encoder_input = ff(norm2(encoder_input)) + encoder_input
 
         for dec in self.decoders:
             self_attention, norm1, cross_attention, norm2, ff, norm3 = dec
-            decoder_input = norm1(self_attention(decoder_input, padding_mask=tgt_padding_mask, \
-                                                 tgt_sequence_mask = tgt_sequence_mask) + decoder_input)
-            decoder_input = norm2(cross_attention(decoder_input, encoder_input, \
-                                                  padding_mask=src_padding_mask) + decoder_input)
-            decoder_input = norm3(ff(decoder_input) + decoder_input)
+            if not norm_first:
+                decoder_input = norm1(self_attention(decoder_input, padding_mask=tgt_padding_mask, \
+                                                    tgt_sequence_mask = tgt_sequence_mask) + decoder_input)
+                decoder_input = norm2(cross_attention(decoder_input, encoder_input, \
+                                                    padding_mask=src_padding_mask) + decoder_input)
+                decoder_input = norm3(ff(decoder_input) + decoder_input)
+            else:
+                decoder_input = self_attention(norm1(decoder_input), padding_mask=tgt_padding_mask, \
+                                                    tgt_sequence_mask = tgt_sequence_mask) + decoder_input
+                decoder_input = cross_attention(norm2(decoder_input), encoder_input, \
+                                                    padding_mask=src_padding_mask) + decoder_input
+                decoder_input = ff(norm3(decoder_input)) + decoder_input
         return decoder_input
 
 class Prediction(nn.Module):
