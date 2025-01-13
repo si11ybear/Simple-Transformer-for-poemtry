@@ -428,8 +428,8 @@ class Transformer(nn.Module):
     """
     def __init__(self, v, h, a, num_encoder_layers, num_decoder_layers, dimFF, dropout, max_len):
         super().__init__()
-        # self.embedding = Embedding(v,h)
-        self.embedding = nn.Embedding(v, h, padding_idx=1)
+        self.embedding = Embedding(v,h)
+        # self.embedding = nn.Embedding(v, h, padding_idx=1)
         self.posEncoding = PositionalEncoding(h, 0, max_len)
         self.transformer = TransformerEncoderDecoder(h, a, num_encoder_layers, num_decoder_layers, dimFF, dropout)
         self.predict = Prediction(h, v)
@@ -478,5 +478,5 @@ class Transformer(nn.Module):
         生成pad掩码
         """
         key_padding_mask = torch.full(tokens.size(), False, dtype=bool)
-        key_padding_mask[tokens == 1] = True
+        # key_padding_mask[tokens == 1] = True
         return key_padding_mask
