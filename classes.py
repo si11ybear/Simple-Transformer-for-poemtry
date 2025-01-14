@@ -478,5 +478,5 @@ class Transformer(nn.Module):
         生成pad掩码
         """
         key_padding_mask = torch.full(tokens.size(), False, dtype=bool)
-        # key_padding_mask[tokens == 1] = True
+        key_padding_mask[tokens == 1] = True
         return key_padding_mask
