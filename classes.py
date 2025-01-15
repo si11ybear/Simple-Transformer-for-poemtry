@@ -72,7 +72,7 @@ class Tokenizer:
         return self.dict_size
 
 
-def index2onehot(word_ids, vocab_size):
+def index2onehot(word_ids, vocab_size, device):
     r"""
     由索引转化为独热编码
     Args:
@@ -93,13 +93,13 @@ def index2onehot(word_ids, vocab_size):
     """
     if word_ids.dim() == 1:
         # 一维情况：(seq_len,)
-        onehot_tensor = torch.zeros(len(word_ids), vocab_size)
+        onehot_tensor = torch.zeros(len(word_ids), vocab_size, device=device)
         for i, s in enumerate(word_ids): 
             onehot_tensor[i, s] = 1
     elif word_ids.dim() == 2:
         # 二维情况：(batch_size, seq_len)
         batch_size, seq_len = word_ids.size()
-        onehot_tensor = torch.zeros(batch_size, seq_len, vocab_size, dtype=torch.float32)
+        onehot_tensor = torch.zeros(batch_size, seq_len, vocab_size, dtype=torch.float32, device = device)
         onehot_tensor.scatter_(2, word_ids.unsqueeze(2), 1)
     else:
         raise ValueError("word_ids must be a 1D or 2D tensor")
@@ -148,7 +148,7 @@ class Embedding(nn.Module):
     """
     嵌入层 将索引转化为独热向量，并线性嵌入
     """
-    def __init__(self, v, h):
+    def __init__(self, v, h, device):
         """
         v: 词汇表大小
         h: 嵌入后维度
@@ -157,10 +157,11 @@ class Embedding(nn.Module):
         self.embedding = nn.Linear(v, h)
         self.h = h
         self.v = v
+        self.device = device
 
     def forward(self, src):
         # print(src.size())
-        onehot_tensor = index2onehot(src, self.v)
+        onehot_tensor = index2onehot(src, self.v, device = self.device)
         # print(onehot_tensor.size())
         return self.embedding(onehot_tensor)
 
@@ -188,7 +189,7 @@ class Attention(nn.Module):
     """
     注意力模块，提供 q = k = v 的自注意力模式和 k = v 的交叉注意力模式
     """
-    def __init__(self, h, a, dropout=0.1, type = 'self'):
+    def __init__(self, h, a, dropout=0.1, type = 'self', device = 'cpu'):
         '''
         h: 嵌入层维度
         a: 注意力头数
@@ -206,6 +207,7 @@ class Attention(nn.Module):
         self.d_k = h // a
         self.types = type
         self.dropout = nn.Dropout(p=dropout)
+        self.device = device
         
         # 初始化Q, K, V的权重矩阵
         # 每个权重矩阵的维数是(s, h//a) 这里是(h, h)，是将每个头的相应矩阵拼接到一起了
@@ -265,7 +267,7 @@ class Attention(nn.Module):
         scores = torch.matmul(q, k.transpose(-1, -2)) * self.scale
         if padding_mask is not None:
             # print(padding_mask)
-            mask = padding_mask.view(batch_size, 1, 1, k_len).expand(batch_size, self.a, q.size()[2], k_len)
+            mask = padding_mask.view(batch_size, 1, 1, k_len).expand(batch_size, self.a, q.size()[2], k_len).to(self.device)
             if tgt_sequence_mask is not None: 
                 assert self.types == 'self' , \
                         (f"Only Self Attention in Decoder Needs Sequence Mask, but now {self.types} attetion!")
@@ -348,7 +350,7 @@ class TransformerEncoderDecoder(nn.Module):
     """
     Transformer中解码器和编码器架构
     """
-    def __init__(self, h, a, num_encoder_layers, num_decoder_layers, dim_feedforward=2048, dropout=0.1):
+    def __init__(self, h, a, num_encoder_layers, num_decoder_layers, dim_feedforward=2048, dropout=0.1, device = 'cpu'):
         """
         h: 输入维度
         a: 注意力头数
@@ -358,7 +360,7 @@ class TransformerEncoderDecoder(nn.Module):
         super().__init__()
         self.encoders = nn.ModuleList([
             nn.ModuleList([
-                Attention(h, a, dropout),
+                Attention(h, a, dropout, device = device),
                 LayerNorm((h,)),
                 FeedForward(h, dropout = dropout),
                 LayerNorm((h,))
@@ -367,9 +369,9 @@ class TransformerEncoderDecoder(nn.Module):
         
         self.decoders = nn.ModuleList([
             nn.ModuleList([
-                Attention(h, a, dropout),
+                Attention(h, a, dropout, device = device),
                 LayerNorm((h,)),
-                Attention(h, a, dropout, type='cross'),
+                Attention(h, a, dropout, type='cross', device = device),
                 LayerNorm((h,)),
                 FeedForward(h, dropout = dropout),
                 LayerNorm((h,))
@@ -426,13 +428,14 @@ class Transformer(nn.Module):
     """
     Transformer架构
     """
-    def __init__(self, v, h, a, num_encoder_layers, num_decoder_layers, dimFF, dropout, max_len):
+    def __init__(self, v, h, a, num_encoder_layers, num_decoder_layers, dimFF, dropout, max_len, device):
         super().__init__()
-        self.embedding = Embedding(v,h)
+        self.embedding = Embedding(v,h, device)
         self.posEncoding = PositionalEncoding(h, 0, max_len)
-        self.transformer = TransformerEncoderDecoder(h, a, num_encoder_layers, num_decoder_layers, dimFF, dropout)
+        self.transformer = TransformerEncoderDecoder(h, a, num_encoder_layers, num_decoder_layers, dimFF, dropout, device = device)
         self.predict = Prediction(h, v)
         self.max_len = max_len
+        self.device = device
 
     def forward(self, src, tgt, src_padding_mask = None, tgt_padding_mask = None, tgt_sequence_mask = None):
         """
@@ -443,11 +446,11 @@ class Transformer(nn.Module):
         如果不手动提供上述掩码，会自动生成默认pad掩码和序列掩码
         """
         if src_padding_mask is None: 
-            src_padding_mask = self.get_key_padding_mask(src)
+            src_padding_mask = self.get_key_padding_mask(src, src.device).to(src.device)
         if tgt_padding_mask is None: 
-            tgt_padding_mask = self.get_key_padding_mask(tgt)
+            tgt_padding_mask = self.get_key_padding_mask(tgt, tgt.device).to(tgt.device)
         if tgt_sequence_mask is None: 
-            tgt_sequence_mask = self.get_sequence_mask(tgt)
+            tgt_sequence_mask = self.get_sequence_mask(tgt, tgt.device).to(tgt.device)
 
         src = self.embedding(src)
         tgt = self.embedding(tgt)
@@ -460,22 +463,22 @@ class Transformer(nn.Module):
         return output
     
     @staticmethod
-    def get_sequence_mask(tgt):
+    def get_sequence_mask(tgt, device):
         """
         tgt: (s,) ---> (s,s)
         生成序列掩码
         """
         size = tgt.size()[-1]
-        sr = torch.triu(torch.full((size, size), True), diagonal=1)
+        sr = torch.triu(torch.full((size, size), True, device = device), diagonal=1)
         # print(sr)
         return sr
 
     @staticmethod
-    def get_key_padding_mask(tokens):
+    def get_key_padding_mask(tokens, device):
         """
         tokens: (s,) ---> (s,)
         生成pad掩码
         """
-        key_padding_mask = torch.full(tokens.size(), False, dtype=bool)
+        key_padding_mask = torch.full(tokens.size(), False, dtype=bool, device = device)
         key_padding_mask[tokens == 1] = True
         return key_padding_mask
