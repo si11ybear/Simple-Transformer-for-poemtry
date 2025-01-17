@@ -6,7 +6,7 @@
 
 在实现上，我参考了kaggle上\href{https://www.kaggle.com/code/alionsss/pytorch-transformer-x/notebook}{PyTorch示例——使用Transformer写古诗}的项目架构，挪用了其数据集、编码器、位置编码的实现和整体框架。
 
-\texttt{./code/classes.py }中提供了所有类定义的实现（包含上述数据集和编码器）；./trans.ipynb中提供了整个模型的全流程实现。
+\texttt{./simpleTransformer/classes.py }中提供了所有类定义的实现（包含上述数据集和编码器）；\texttt{./simpleTransformer/trans.ipynb}中提供了整个模型的全流程实现。
 
 \subsection{模块类型的定义}
 
@@ -20,13 +20,13 @@
 
 \subsubsection{嵌入层}
 
-嵌入层主要用于将一个序列转化为编码器、解码器的输入，请关注\texttt{classes.py}中的Embedding类。
+嵌入层主要用于将一个序列转化为编码器、解码器的输入，请关注\texttt{./simpleTransformer/classes.py}中的Embedding类。
 
 具体来讲，对于一个序列长度为$s$，词典大小为$v$的形状为$(s,)$的序列输入，每个位置的值代表一个汉字，我们首先将其转化为形状为$(s,v)$的独热向量，再经过线性层$(v,h)$，得到形状为$(s,h)$的嵌入向量。
 
 \subsubsection{注意力模块}
 
-请关注\texttt{classes.py}中的Attention类。
+请关注\texttt{./simpleTransformer/classes.py}中的Attention类。
 
 自注意力和交叉注意力机制的逻辑实质上是相同的，只是在调用时需要使用不同的输入参数。因为本项目中只会使用到自注意力和交叉注意力机制，因此我们假定要么$q,k,v$的输入相同，要么$k,v$的输入相同。
 
@@ -54,7 +54,7 @@ $$
 
 \subsubsection{掩码}
 
-请关注\texttt{classes.py}中的Transformer类中关于mask的部分，部分实现如图\ref{fig:simpletT-mask}。
+请关注\texttt{./simpleTransformer/classes.py}中的Transformer类中关于mask的部分，部分实现如图\ref{fig:simpletT-mask}。
 
 \begin{figure}[h]
     \centering
@@ -71,7 +71,7 @@ $$
 
 \subsubsection{TransformerEncoderDecoder模块}
 
-请关注\texttt{classes.py}中的TransformerEncoderDecoder类。
+请关注\texttt{./simpleTransformer/classes.py}中的TransformerEncoderDecoder类。
 
 在这里，我们实现了Transformer模型的主要模块，提供自定义编码器、解码器的层数，注意力的头数，掩码，前馈神经网络隐层维度等。
 
@@ -83,14 +83,14 @@ $$
 
 这里的实现和原理比较简单，残差连接的具体实现在TransformerEncoderDecoder类中，这里我们实现了改进策略中Layernorm的结构调整（\ref{sec-4:ln-adjust}），可以在调用时指定norm\_first参数来决定使用哪一种Layernorm，如果\texttt{norm\_first == True}，则使用Pre-LN Transformer layer。
 
-\paragraph{层归一化} 请关注\texttt{classes.py}中的LayerNorm类。在此我们只关注一个点，在实现层归一化时，不应假定矩阵的维数，而是直接将其最后一层归一化即可，这样提高了我们代码的可复用性和可扩展性。
+\paragraph{层归一化} 请关注\texttt{./simpleTransformer/classes.py}中的LayerNorm类。在此我们只关注一个点，在实现层归一化时，不应假定矩阵的维数，而是直接将其最后一层归一化即可，这样提高了我们代码的可复用性和可扩展性。
 
-\paragraph{全连接前馈神经网络} 请关注\texttt{classes.py}中的FeedForward类。这里我们提供了两种可选的激活函数，部分实现了\ref{sec-4:nonlinear-activation}中的改进策略，分别是RELU和GELU。
+\paragraph{全连接前馈神经网络} 请关注\texttt{./simpleTransformer/classes.py}中的FeedForward类。这里我们提供了两种可选的激活函数，部分实现了\ref{sec-4:nonlinear-activation}中的改进策略，分别是RELU和GELU。
 \\
 
 除了以上类外，还有一些较为简单的类，比如位置编码（PositionalEncoding类）、预测层（Prediction类）等，不再赘述。
 
-\paragraph{模型构建} 请关注\texttt{classes.py}中的Transformer类，我们将所有需要的模块分别初始化后，通过前向传播路径拼装到一起，构成最终的Transformer模型。我们还在这个类中为注意力模块添加了默认掩码。
+\paragraph{模型构建} 请关注\texttt{./simpleTransformer/classes.py}中的Transformer类，我们将所有需要的模块分别初始化后，通过前向传播路径拼装到一起，构成最终的Transformer模型。我们还在这个类中为注意力模块添加了默认掩码。
 
 \subsection{模型训练和表现}
 
@@ -109,7 +109,7 @@ $$
     \label{fig:simpleT-performance}
 \end{figure}
 
-如希望进行类似测试，可以在\texttt{./trans.ipynb}中运行“模型训练”上方所有单元格（类定义和超参数）及“存储模型”（绘制损失函数之后）下方所有单元格（加载模型参数和预测），即可在避免训练的情况下进行相应测试。
+如希望进行类似测试，可以在\texttt{./simpleTransformer/trans.ipynb}中运行“模型训练”上方所有单元格（类定义和超参数）及“存储模型”（绘制损失函数之后）下方所有单元格（加载模型参数和预测），即可在避免训练的情况下进行相应测试。
 
 \subsection{构建过程中的问题和解决}
 
@@ -123,7 +123,7 @@ $$
 
 经过较长时间的试错后，我发现可以\textbf{针对每个模块，提供相同的输入给我的实现和Pytorch的实现，并且在模型初始化后，指定模型的参数相同，避免参数初始化的随机性影响结果，再比较他们的输出是否相同，以此来判断模块是否正常。}在机器学习中，如果像数学证明中验证两个对象是否相等的逻辑，的确很难进行，但这种排除随机性，验证相同输入下输出是否相同的方法反而是有效和易用的。
 
-\texttt{./code/Comparision.ipynb} 实现了上述自定义模块和Pytorch相应模块的检验。
+\texttt{./simpleTransformer/Comparision.ipynb} 实现了上述自定义模块和Pytorch相应模块的检验。
 
 \subsubsection{维度验证}
 
@@ -141,7 +141,7 @@ Pytorch提供的接口能够便捷的改变张量的形状，但与二维矩阵�
 
 \subsubsection{模块的可复用性}
 
-通过类这种面向对象的编程方式，我们能够复用我们定义好的模块。不过python无法导入定义在\texttt{.ipynb}文件中的方法，因此，我们将所有的类定义单独封装在.\texttt{/classes.py}中，可以通过在其他文件中\texttt{from classes import *}复用我们的类和方法，也方便了后续进行的古诗文写作助手的进一步优化和封装。
+通过类这种面向对象的编程方式，我们能够复用我们定义好的模块。不过python无法导入定义在\texttt{.ipynb}文件中的方法，因此，我们将所有的类定义单独封装在\texttt{./simpleTransformer/classes.py}中，可以通过在其他文件中\texttt{from classes import *}复用我们的类和方法，也方便了后续进行的古诗文写作助手的进一步优化和封装。
 
 另一方面，通过定义多个子模块，我们可以像积木一样任意的拼接各个模块，从而产生不同结构的模型，进行不同的尝试，这也是面向对象编程的一大乐趣。
 
