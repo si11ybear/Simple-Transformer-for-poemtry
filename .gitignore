@@ -1,11 +1,10 @@
-*.pdf
+*参考文献
 *.bib
 /.vscode
 /.history
 *.pyc
 
-# data
-./PoemWriter/data/*.txt
+/PoemWriter/data/*.txt
 
 # tex
 *.aux

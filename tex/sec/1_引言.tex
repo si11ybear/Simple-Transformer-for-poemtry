@@ -1,0 +1,27 @@
+\section{引言}\label{sec-1}
+
+Transformer模型是一种深度学习模型架构，它在\citeyear{vaswaniAttentionAllYou2023}年由\citeauthor{vaswaniAttentionAllYou2023}在论文\textit{Attention Is All You Need}中首次提出\citep{vaswaniAttentionAllYou2023}。这种架构基于注意力机制，解决了主要用于处理序列数据，并且在自然语言处理（NLP）领域取得了革命性的进展，尤其是在机器翻译、文本理解、文本生成等任务中。
+
+在此之后，基于Transformer的各种模型层出不穷，出现了诸如BERTs、GPTs等一系列影响深远的大模型。为了更加熟悉Transformer模型的各种细节和改进方式，在本项目中，我们将简要介绍Transformer和一些改进策略，并利用Pytorch单元模块逐步搭建一个简易的Transformer模型，利用若干古诗句作为数据集训练一个能够根据一句古诗已有的前半句自由书写出后半句的模型。进一步，我们还尝试了将这个模型封装为一个古诗写作助手。
+
+\paragraph{本文的组织方式} 
+第\ref{sec-2}节是对已有工作的调研和综述，
+第\ref{sec-3}节将简要介绍Transformer模型，
+第\ref{sec-4}节将介绍几种Transformer的改进方式和效果，
+第\ref{sec-5}节介绍Transformer模型构建的方式和过程，并将Transformer模型训练为能够根据一句古诗已有的前半句自由书写出后半句的模型，
+第\ref{sec-7}节介绍将前述模型封装成为古诗写作助手和其实现效果，
+第\ref{sec-8}节是本项目的总结与反思。
+
+\paragraph{项目结构}
+
+在提交的文件中，第一部分是基础的Transformer架构类定义和基础模型展示，第二部分是数据集整理，第三部分是古诗写作助手的封装。代码文件的具体架构可以参见\texttt{README.md}。
+
+\paragraph{分工介绍}
+\begin{itemize}
+    \item 丁玺博：阅读、总结论文，模型训练与封装，改造推理模式，古诗文写作助手的全部设计与实现，项目代码整理；项目报告第\ref{sec-4}，\ref{sec-7}，\ref{sec-8}节的撰写。
+    \item 李健宁：阅读、总结Transformer原始论文\cite{vaswaniAttentionAllYou2023}，构建基础Transformer模型，将部分改进方式应用到构建的Transformer模型中；使模型能够根据一句古诗已有的前半句自由书写出后半句；模型封装，项目文件和代码整理，项目代码运行测试；项目报告第\ref{sec-1}，\ref{sec-3}， \ref{sec-5}，\ref{sec-8}节的撰写。
+    \item 肖庆成：阅读、总结论文，并将改进方式应用到构建的Transformer模型中；和丁玺博共同将模型封装为古诗文写作助手并进一步优化；项目报告第\ref{sec-2}，\ref{sec-4}，\ref{sec-7}，\ref{sec-8}节的撰写。
+\end{itemize}
+
+
+

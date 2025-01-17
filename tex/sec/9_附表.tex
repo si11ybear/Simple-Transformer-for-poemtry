@@ -1,0 +1,166 @@
+\appendix
+\section{附表}\label{sec-9}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{l|cc}
+    \toprule
+    \textbf{Training Steps} & \textbf{65,536} & \textbf{524,288} \\
+    \midrule
+    $\text{FFN}_{\text{ReLU}}$ (baseline) & 1.997 (0.005) & 1.677 \\
+    $\text{FFN}_{\text{GELU}}$ & 1.983 (0.005) & 1.679 \\
+    $\text{FFN}_{\text{Swish}}$ & 1.994 (0.003) & 1.683 \\
+    \midrule
+    $\text{FFN}_{\text{GLU}}$ & 1.982 (0.006) & 1.663 \\
+    $\text{FFN}_{\text{Bilinear}}$ & 1.960 (0.005) & 1.648 \\
+    $\text{FFN}_{\text{GEGLU}}$ & \textbf{1.942} (0.004) & \textbf{1.633} \\
+    $\text{FFN}_{\text{SwiGLU}}$ & \textbf{1.944} (0.010) & \textbf{1.636} \\
+    $\text{FFN}_{\text{ReGLU}}$ & 1.953 (0.003) & 1.645 \\
+    \bottomrule
+\end{tabular}
+\caption{Training Setup V.S. log-perplexity}
+\label{tab:results}
+\end{table}
+
+\begin{table}[ht]
+    	\centering
+    	\resizebox{\textwidth}{!}{% Adjust the table to fit the text width
+    		\begin{tabular}{l|c|cccccccccccc}
+    			\toprule
+    			& Score & CoLA & SST-2 & MRPC & MRPC & STSB & STSB & QQP & QQP & MNLI & MNLI & QNLI & RTE \\
+    			& Average & MCC & Acc & F1 & Acc & PCC & SCC & F1 & Acc & m & mm & Acc & Acc \\
+    			\midrule
+    			FFN$_{\text{ReLU}}$ & 83.80 & 51.32 & 94.04 & \textbf{93.08} & \textbf{90.20} & 89.64 & 89.42 & 80.01 & 91.75 & 85.83 & 86.42 & 92.81 & 80.14 \\
+    			FFN$_{\text{GELU}}$ & 83.86 & 53.48 & 94.04 & 92.81 & \textbf{90.20} & 89.69 & 89.49 & 88.63 & 91.62 & 85.89 & 86.13 & 92.39 & 80.51 \\
+    			FFN$_{\text{Swish}}$ & 83.60 & 49.79 & 93.69 & 92.31 & 89.46 & 89.88 & 88.84 & 88.84 & 91.67 & 85.22 & 85.02 & 92.33 & 81.23 \\
+    			\midrule
+    			FFN$_{\text{GLU}}$ & 84.20 & 49.16 & 94.27 & 92.39 & 89.46 & 89.46 & 89.35 & 88.79 & 91.62 & 86.36 & 86.18 & 92.92 & \textbf{84.12} \\
+    			FFN$_{\text{GEGLU}}$ & 84.12 & 53.65 & 93.92 & 92.68 & 89.71 & 90.26 & 90.13 & 89.11 & 91.85 & 86.15 & 86.17 & 92.81 & 79.42 \\
+    			FFN$_{\text{BiLinear}}$ & 83.79 & 51.02 & \textbf{94.28} & 92.28 & 89.46 & 90.06 & 89.84 & 88.95 & 91.69 & \textbf{86.90} & \textbf{87.08} & 92.92 & 81.95 \\
+    			FFN$_{\text{SwiGLU}}$ & 84.36 & 51.59 & 93.92 & 92.23 & 88.97 & \textbf{90.32} & \textbf{90.13} & \textbf{89.14} & \textbf{89.17} & 86.45 & \textbf{87.47} & \textbf{92.93} & 83.39 \\
+    			FFN$_{\text{ReGLU}}$ & \textbf{84.67} & \textbf{56.16} & \textbf{94.28} & 92.06 & 89.22 & 89.97 & 89.85 & 88.86 & 91.72 & 86.20 & 86.40 & 92.68 & 81.59 \\
+    			\midrule
+    			Raffel et al., 2019 & 83.28 & 53.84 & 92.68 & 92.07 & 88.92 & 88.02 & 87.94 & 88.67 & 91.56 & 84.24 & 84.57 & 90.48 & 76.28 \\
+    			ibid. stddev. & 0.235 & 1.111 & 0.569 & 0.729 & 1.019 & 0.374 & 0.418 & 0.108 & 0.070 & 0.291 & 0.231 & 0.361 & 1.393 \\
+    			\bottomrule
+    	\end{tabular}}
+    	\caption{GLUE在语言理解任务上的结果}
+    	\label{tab:glue_results1}
+\end{table}
+
+\begin{table}[ht]
+    \centering
+    	\resizebox{\textwidth}{!}{% Adjust the table to fit the text width
+    		\begin{tabular}{l|c|ccccccccccc}
+    			\toprule
+    			& Score & BoolQ & CB & CB & CoPA & MultiRC & MultiRC & ReCoRD & ReCoRD & RTE & WiC & WSC \\
+    			& Average & Acc & F1 & Acc & Acc & F1 & EM & F1 & EM & Acc & Acc & Acc \\
+    			\midrule
+    			$\text{FFN}_{\text{ReLU}}$ (baseline) & 72.76 & 80.15 & 83.37 & 89.29 & 70.00 & 76.39 & 39.14 & 73.73 & 72.91 & 83.39 & 67.71 & 77.88 \\
+    			$\text{FFN}_{\text{GELU}}$ & 72.98 & 80.64 & 86.24 & \textbf{91.07} & 74.00 & 75.93 & 38.61 & 72.66 & 72.03 & 81.59 & 68.34 & 75.96 \\
+    			$\text{FFN}_{\text{Swish}}$ & 72.40 & 80.43 & 77.75 & 83.93 & 67.00 & 76.34 & 39.14 & 73.34 & 72.36 & 81.95 & 68.18 & 81.73 \\
+    			\midrule
+    			$\text{FFN}_{\text{GLU}}$ & 73.95 & 80.95 & 77.26 & 83.93 & 73.00 & 76.07 & 39.03 & 74.22 & 73.50 & 84.12 & 67.71 & \textbf{87.50} \\
+    			$\text{FFN}_{\text{GEGLU}}$ & 73.96 & 81.19 & 82.09 & 87.50 & 72.00 & \textbf{77.43} & \textbf{41.03} & 75.28 & \textbf{74.60} & 83.39 & 67.08 & 83.65 \\
+    			$\text{FFN}_{\text{Bilinear}}$ & 73.81 & \textbf{81.53} & 82.49 & 89.29 & \textbf{76.00} & 76.04 & 40.92 & 74.97 & 74.10 & 82.67 & \textbf{69.28} & 78.85 \\
+    			$\text{FFN}_{\text{SwiGLU}}$ & \textbf{74.56} & 81.19 & 82.39 & 89.29 & 73.00 & 75.56 & 38.72 & \textbf{75.35} & 74.55 & \textbf{85.20} & 67.24 & 86.54 \\
+    			$\text{FFN}_{\text{ReGLU}}$ & 73.66 & 80.89 & \textbf{86.37} & \textbf{91.07} & 67.00 & 75.32 & 40.50 & 75.07 & 74.10 & 84.88 & 68.04 & 78.81 \\
+    			\midrule
+    			Raffel et al., 2019 & 71.36 & 76.62 & 91.22 & 91.96 & 66.20 & 66.13 & 25.78 & 69.05 & 76.10 & 73.34 & 68.94 & 78.56 \\
+    			ibid, stddev. & 0.416 & 0.365 & 3.237 & 2.560 & 2.741 & 0.716 & 1.011 & 0.370 & 0.379 & 1.228 & 0.850 & 2.029 \\
+    			\bottomrule
+    	\end{tabular}}
+    	\caption{基于预训练微调的语言理解任务结果}
+    	\label{tab:glue_results2}
+    \end{table}
+
+    \begin{table}[ht]
+    \centering
+    \begin{tabular}{@{}llcc@{}}
+    \toprule
+    \textbf{Model} & \textbf{Position Information} & \textbf{EN-DE BLEU} & \textbf{EN-FR BLEU} \\ \midrule
+	Transformer (base) & Absolute Position Representations & 26.5 & 38.2 \\
+	Transformer (base) & Relative Position Representations & \textbf{26.8} & \textbf{38.7} \\ \midrule
+	Transformer (big) & Absolute Position Representations & 27.9 & 41.2 \\
+	Transformer (big) & Relative Position Representations & \textbf{29.2} & \textbf{41.5} \\ \bottomrule
+    \end{tabular}
+    \caption{关于WMT 2014英德（EN-DE）和英法（EN-FR）翻译任务的实验结果，使用的是newstest2014测试集.}
+    \label{tab:results1}
+\end{table}
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{@{}cc@{}}
+    \toprule
+	$ k $ & EN-DE BLEU \\ \midrule
+	0 & 12.5 \\
+	1 & 25.5 \\
+	2 & 25.8 \\
+	4 & 25.9 \\
+	16 & 25.8 \\
+	64 & 25.9 \\
+	256 & 25.8 \\ \bottomrule
+    \end{tabular}
+    \caption{关于变化裁剪距离 $ k $的实验结果.}
+    \label{tab:clipping-distance-results}
+\end{table}
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{@{}ccc@{}}
+    \toprule
+        $ a_{ij}^V $ & $ a_{ij}^K $ & EN-DE BLEU \\ \midrule
+	Yes & Yes & 25.8 \\
+	No & Yes & 25.8 \\
+	Yes & No & 25.3 \\
+	No & No & 12.5 \\ \bottomrule
+    \end{tabular}
+    \caption{关于相对位置编码 $ a_{ij}^V $和$ a_{ij}^K $的实验结果.}
+    \label{tab:ablation-results}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Model} & \textbf{Bits per byte} \\ \hline
+\multicolumn{2}{|c|}{\textbf{CIFAR-10}} \\ \hline
+PixelCNN (Oord et al., 2016) & 3.03 \\ \hline
+PixelCNN++ (Salimans et al., 2017) & 2.92 \\ \hline
+Image Transformer (Parmar et al., 2018) & 2.90 \\ \hline
+PixelSNAIL (Chen et al., 2017) & 2.85 \\ \hline
+Sparse Transformer 59M (strided) & 2.80 \\ \hline
+\multicolumn{2}{|c|}{\textbf{Enwik8}} \\ \hline
+Deeper Self-Attention (Al-Rfou et al., 2018) & 1.06 \\ \hline
+Transformer-XL 88M (Dai et al., 2018) & 1.03 \\ \hline
+Transformer-XL 277M (Dai et al., 2018) & 0.99 \\ \hline
+Sparse Transformer 95M (fixed) & 0.99 \\ \hline
+\multicolumn{2}{|c|}{\textbf{ImageNet 64x64}} \\ \hline
+PixelCNN (Oord et al., 2016) & 3.57 \\ \hline
+Parallel Multiscale (Reed et al., 2017) & 3.7 \\ \hline
+Glow (Kingma \& Dhariwal, 2018) & 3.81 \\ \hline
+SPN 150M (Menick \& Kalchbrenner, 2018) & 3.52 \\ \hline
+Sparse Transformer 152M (strided) & 3.44 \\ \hline
+\multicolumn{2}{|c|}{\textbf{Classical music, 5 seconds at 12 kHz}} \\ \hline
+Sparse Transformer 152M (strided) & 1.97 \\ \hline
+\end{tabular}
+\caption{我们对于密度建模任务的发现总结如下。结果以每字节比特数报告，这等同于图像任务中的每维度比特数。M指的是参数的数量，以百万为单位。}
+\label{tab:performance_comparison}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Model} & \textbf{Bits per byte} & \textbf{Time/Iter} \\ \hline
+\multicolumn{3}{|c|}{\textbf{Enwik8 (12,288 context)}} \\ \hline
+Dense Attention & 1.00 & 1.31 \\ \hline
+Sparse Transformer (Fixed) & \textbf{0.99} & 0.55 \\ \hline
+Sparse Transformer (Strided) & 1.13 & 0.35 \\ \hline
+\multicolumn{3}{|c|}{\textbf{CIFAR-10 (3,072 context)}} \\ \hline
+Dense Attention & 2.82 & 0.54 \\ \hline
+Sparse Transformer (Fixed) & 2.85 & 0.47 \\ \hline
+Sparse Transformer (Strided) & \textbf{2.80} & 0.38 \\ \hline
+\end{tabular}
+\caption{稀疏模式展示了在我们能够比较两者的数据集上，不仅速度得到了提升，而且损失函数值也更优。这可能指向了我们学习到的模式中存在有用的归纳偏置，或者表明全注意力机制下存在潜在的优化问题。}
+\label{tab:model_comparison}
+\end{table}

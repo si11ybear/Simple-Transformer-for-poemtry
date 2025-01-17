@@ -1,0 +1,61 @@
+\documentclass[UTF8]{ctexart}
+
+\usepackage{amsmath, amsthm, amssymb, booktabs, graphicx, amsfonts, indentfirst}
+\usepackage{fancyhdr, color, framed, enumitem, titlesec, enumitem}
+\usepackage{ulem,xeCJKfntef}
+\usepackage[perpage]{footmisc}
+\usepackage{appendix}
+\linespread{1.28}
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=1.5cm,right=1.5cm,marginparwidth=1.75cm]{geometry}
+\usepackage[colorlinks,
+            linkcolor=blue,
+            anchorcolor=blue,
+            citecolor=blue]{hyperref}
+\usepackage{natbib}
+
+\title{Transformer Pretaining项目报告\\
+        % \Large 
+        }
+\author{丁玺博 \and 李健宁 \and 肖庆成}
+\date{\today}
+
+\setlength{\parindent}{4pt}
+\setlength{\headheight}{27pt}
+\pagestyle{fancy}
+
+% \newtheorem{theorem}{\indent 定理}[subsection]
+% \newtheorem{definition}[theorem]{\indent 定义}
+% \newtheorem{prop}[theorem]{\indent 命题}
+
+
+\begin{document}
+\maketitle
+% \begin{abstract}
+%     本文。
+% \end{abstract}
+\setcounter{tocdepth}{2}
+\bibliographystyle{apalike}
+\tableofcontents
+\clearpage
+
+% \section{引言}
+\input{sec/1_引言}
+% \section{文献综述}
+\input{sec/2_综述}
+% \section{Transformer模型}
+\input{sec/3_Transformer}
+% \section{改进策略}
+\input{sec/4_改进策略}
+% \section{模型构建}
+\input{sec/5_simpleTransformer}
+% \section{古诗文写作助手}
+\input{sec/7_古诗文写作助手}
+% \section{总结与反思}
+\input{sec/8_总结和反思}
+% \section{附表}
+\input{sec/9_附表}
+
+\clearpage
+\bibliography{ref}
+\end{document}
+
