@@ -1,6 +1,21 @@
 *.pdf
 *.bib
-*-*.ipynb
 /.vscode
 /.history
 *.pyc
+
+# data
+./PoemWriter/data/*.txt
+
+# tex
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.fdb_latexmk
+*.fls
+*.gz
+*.xdv
